@@ -15,7 +15,7 @@ module macc_8x8_20 (
 
     logic clk1_buf;
 
-    (* keep, BEL="X0Y9.A" *) GBUF clock1_buf (
+    GBUF clock1_buf (
       .IN   (clk1),
       .OUT  (clk1_buf)
     );

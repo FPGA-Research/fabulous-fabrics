@@ -23,14 +23,14 @@ module register_file (
 
     logic clk1_buf;
 
-    (* keep, BEL="X0Y9.A" *) GBUF clock1_buf (
+    GBUF clock1_buf (
       .IN   (clk1),
       .OUT  (clk1_buf)
     );
 
     logic clk2_buf;
 
-    (* keep, BEL="X0Y9.B" *) GBUF clock2_buf (
+    GBUF clock2_buf (
       .IN   (clk2),
       .OUT  (clk2_buf)
     );

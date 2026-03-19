@@ -12,7 +12,7 @@ module sys_reset (
 
     wire clk1_buf;
 
-    (* keep, BEL="X0Y9.A" *) GBUF clock_buf_i (
+    GBUF clock_buf_i (
       .IN   (clk1),
       .OUT  (clk1_buf)
     );
@@ -23,7 +23,7 @@ module sys_reset (
         .RESET(rst)
     );
     
-    (* keep, BEL="X0Y9.B" *) GBUF rst_buf_i (
+    GBUF rst_buf_i (
       .IN   (rst),
       .OUT  (rst_buf)
     );
