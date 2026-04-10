@@ -56,15 +56,20 @@ jobs:
         with:
           nix_system: x86_64-linux
           derivation: github:mole99/librelane_plugin_fabulous
+      - name: Get the tile library hash
+        run: |
+          echo "TILE_LIBRARY_SHORT_HASH=$(git rev-parse --short HEAD:ip/fabulous-tiles)" >> $GITHUB_ENV
       - name: Cache the tiles
         uses: actions/cache@v5
+        id: cache
         with:
           path: ip/fabulous-tiles/tiles
-          key: cache-tiles-${{ matrix.tile_library }}-${{ matrix.pdk }}-${{ github.sha }}
+          key: cache-tiles-${{ matrix.tile_library }}-${{ matrix.pdk }}-${{ env.TILE_LIBRARY_SHORT_HASH }}
       - name: Implement the tiles
+        if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          PDK=${{ matrix.pdk }} TILE_LIBRARY=${{ matrix.tile_library }} nix develop --command bash -c "cd ip/fabulous-tiles/ && make all"
-      
+          cd ip/fabulous-tiles/; PDK=${{ matrix.pdk }} TILE_LIBRARY=${{ matrix.tile_library }} nix develop --command make all
+
   fabrics:
     runs-on: ubuntu-24.04
     needs: [tiles]
@@ -93,15 +98,15 @@ jobs:
         uses: ./.github/actions/build_nix
         with:
           nix_system: x86_64-linux
-          derivation: github:mole99/librelane_plugin_fabulous
       - name: Get the tile library
         run: |
           echo "TILE_LIBRARY=$(echo "${{ matrix.fabrics }}" | cut -d'_' -f1)" >> $GITHUB_ENV
+          echo "TILE_LIBRARY_SHORT_HASH=$(git rev-parse --short HEAD:ip/fabulous-tiles)" >> $GITHUB_ENV
       - name: Restore the tiles
         uses: actions/cache/restore@v5
         with:
           path: ip/fabulous-tiles/tiles
-          key: cache-tiles-${{ env.TILE_LIBRARY }}-${{ matrix.pdk }}-${{ github.sha }}
+          key: cache-tiles-${{ env.TILE_LIBRARY }}-${{ matrix.pdk }}-${{ env.TILE_LIBRARY_SHORT_HASH }}
           fail-on-cache-miss: true
       - name: Stitch the tiles
         run: |
@@ -113,12 +118,12 @@ jobs:
           name: ${{ matrix.fabrics }}_${{ matrix.pdk }}
           path: fabrics/${{ matrix.fabrics }}/macro/${{ matrix.pdk }}/
           include-hidden-files: true
-      - name: Build the User Designs
+      - name: Implement the User Designs
         run: |
           cd user_designs; PDK=${{ matrix.pdk }} TILE_LIBRARY=${{ env.TILE_LIBRARY }} FABRIC=${{ matrix.fabrics }} nix develop --command make all
-      - name: Simulate the Fabric (Emulation)
+      - name: Simulate the Fabric (RTL Emulation)
         run: |
           EMULATION=counter PDK=${{ matrix.pdk }} TILE_LIBRARY=${{ env.TILE_LIBRARY }} FABRIC=${{ matrix.fabrics }} nix develop --command bash -c "cd tb; python3 fabric_tb.py"
-      - name: Simulate the Fabric (Simulation)
+      - name: Simulate the Fabric (RTL Simulation)
         run: |
           PDK=${{ matrix.pdk }} TILE_LIBRARY=${{ env.TILE_LIBRARY }} FABRIC=${{ matrix.fabrics }} nix develop --command bash -c "cd tb; python3 fabric_tb.py"
