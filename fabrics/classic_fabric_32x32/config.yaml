@@ -51,6 +51,9 @@ PRIMARY_GDSII_STREAMOUT_TOOL: klayout
 #CLOCK_PERIOD: 20
 #CLOCK_PORT: UserCLK
 
+# Timing model generation
+FABULOUS_TIMING_MODEL: PHYSICAL
+
 # PDK specific
 pdk::sky130*:
     # Routing

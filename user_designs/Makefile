@@ -9,6 +9,17 @@ $(info $(TILE_LIBRARY))
 # Get the design names
 DESIGNS :=  $(patsubst designs/${TILE_LIBRARY}/%/,%,$(wildcard designs/${TILE_LIBRARY}/*/)) 
 
+ifneq ($(FABRIC),classic_fabric_heichips25)
+DESIGNS := $(filter-out ihp_sram_1024x32_1rw,$(DESIGNS))
+DESIGNS := $(filter-out mem_1024x32_1rw,$(DESIGNS))
+endif
+
+ifeq ($(FABRIC),classic_fabric_heichips25)
+DESIGNS := $(filter-out macc_8x8_20,$(DESIGNS))
+DESIGNS := $(filter-out ram_32x4_2r_1w,$(DESIGNS))
+DESIGNS := $(filter-out register_file,$(DESIGNS))
+endif
+
 DESIGNS_CLEAN := $(addsuffix -clean,$(DESIGNS))
 DESIGNS_SYNTH := $(addsuffix -synth,$(DESIGNS))
 DESIGNS_PNR := $(addsuffix -pnr,$(DESIGNS))

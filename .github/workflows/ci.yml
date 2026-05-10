@@ -35,14 +35,12 @@ jobs:
         pdk: [sky130A, gf180mcuD, ihp-sg13g2]
         tile_library: [classic, tiny]
         exclude:
-        # Disably tiny for sky130A and gf180mcuD
-        - tile_library: tiny
-          pdk: sky130A
+        # Disably tiny for gf180mcuD
         - tile_library: tiny
           pdk: gf180mcuD
     name: Tiles (${{ matrix.tile_library }}/${{ matrix.pdk }})
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: 'true'
       - name: Setup Nix
@@ -76,16 +74,19 @@ jobs:
     strategy:
       matrix:
         pdk: [sky130A, gf180mcuD, ihp-sg13g2]
-        fabrics: [classic_fabric_10x10, tiny_fabric_5x5]
+        fabrics: [classic_fabric_10x10, classic_fabric_heichips25, tiny_fabric_5x5]
         exclude:
-        # Disably tiny_fabric_5x5 for sky130A and gf180mcuD
+        # Disably tiny_fabric_5x5 for gf180mcuD
         - fabrics: tiny_fabric_5x5
+          pdk: gf180mcuD
+        # Disably classic_fabric_heichips25 for sky130A and gf180mcuD
+        - fabrics: classic_fabric_heichips25
           pdk: sky130A
-        - fabrics: tiny_fabric_5x5
+        - fabrics: classic_fabric_heichips25
           pdk: gf180mcuD
     name: Fabric (${{ matrix.fabrics }}/${{ matrix.pdk }})
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           submodules: 'true'
       - name: Setup Nix
