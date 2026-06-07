@@ -34,11 +34,12 @@ jobs:
       matrix:
         pdk: [sky130A, gf180mcuD, ihp-sg13g2]
         tile_library: [classic, tiny]
-        exclude:
-        # Disably tiny for gf180mcuD
-        - tile_library: tiny
-          pdk: gf180mcuD
-    name: Tiles (${{ matrix.tile_library }}/${{ matrix.pdk }})
+        scl: [default]
+        include:
+          - pdk: gf180mcuD
+            tile_library: tiny
+            scl: gf180mcu_as_sc_mcu7t3v3
+    name: Tiles (${{ matrix.tile_library }}/${{ matrix.pdk }}/${{ matrix.scl }})
     steps:
       - uses: actions/checkout@v6
         with:
@@ -62,11 +63,11 @@ jobs:
         id: cache
         with:
           path: ip/fabulous-tiles/tiles
-          key: cache-tiles-${{ matrix.tile_library }}-${{ matrix.pdk }}-${{ env.TILE_LIBRARY_SHORT_HASH }}
+          key: cache-tiles-${{ matrix.tile_library }}-${{ matrix.pdk }}-${{ matrix.scl }}-${{ env.TILE_LIBRARY_SHORT_HASH }}
       - name: Implement the tiles
         if: steps.cache.outputs.cache-hit != 'true'
         run: |
-          cd ip/fabulous-tiles/; PDK=${{ matrix.pdk }} TILE_LIBRARY=${{ matrix.tile_library }} nix develop --command make all
+          cd ip/fabulous-tiles/; PDK=${{ matrix.pdk }} SCL=${{ matrix.scl }} TILE_LIBRARY=${{ matrix.tile_library }} nix develop --command make all
 
   fabrics:
     runs-on: ubuntu-24.04
@@ -74,17 +75,19 @@ jobs:
     strategy:
       matrix:
         pdk: [sky130A, gf180mcuD, ihp-sg13g2]
-        fabrics: [classic_fabric_10x10, classic_fabric_heichips25, tiny_fabric_5x5]
+        fabric: [classic_fabric_10x10, classic_fabric_heichips25, tiny_fabric_5x5]
+        scl: [default]
         exclude:
-        # Disably tiny_fabric_5x5 for gf180mcuD
-        - fabrics: tiny_fabric_5x5
-          pdk: gf180mcuD
         # Disably classic_fabric_heichips25 for sky130A and gf180mcuD
-        - fabrics: classic_fabric_heichips25
+        - fabric: classic_fabric_heichips25
           pdk: sky130A
-        - fabrics: classic_fabric_heichips25
+        - fabric: classic_fabric_heichips25
           pdk: gf180mcuD
-    name: Fabric (${{ matrix.fabrics }}/${{ matrix.pdk }})
+        include:
+          - pdk: gf180mcuD
+            fabric: tiny_fabric_5x5
+            scl: gf180mcu_as_sc_mcu7t3v3
+    name: Fabric (${{ matrix.fabric }}/${{ matrix.pdk }}/${{ matrix.scl }})
     steps:
       - uses: actions/checkout@v6
         with:
@@ -101,30 +104,30 @@ jobs:
           nix_system: x86_64-linux
       - name: Get the tile library
         run: |
-          echo "TILE_LIBRARY=$(echo "${{ matrix.fabrics }}" | cut -d'_' -f1)" >> $GITHUB_ENV
+          echo "TILE_LIBRARY=$(echo "${{ matrix.fabric }}" | cut -d'_' -f1)" >> $GITHUB_ENV
           echo "TILE_LIBRARY_SHORT_HASH=$(git rev-parse --short HEAD:ip/fabulous-tiles)" >> $GITHUB_ENV
       - name: Restore the tiles
         uses: actions/cache/restore@v5
         with:
           path: ip/fabulous-tiles/tiles
-          key: cache-tiles-${{ env.TILE_LIBRARY }}-${{ matrix.pdk }}-${{ env.TILE_LIBRARY_SHORT_HASH }}
+          key: cache-tiles-${{ env.TILE_LIBRARY }}-${{ matrix.pdk }}-${{ matrix.scl }}-${{ env.TILE_LIBRARY_SHORT_HASH }}
           fail-on-cache-miss: true
       - name: Stitch the tiles
         run: |
-          PDK=${{ matrix.pdk }} nix develop --command make ${{ matrix.fabrics }}
+          PDK=${{ matrix.pdk }} SCL=${{ matrix.scl }} nix develop --command make ${{ matrix.fabric }}
       - name: Upload Macro Folder
         if: success() || failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
-          name: ${{ matrix.fabrics }}_${{ matrix.pdk }}
-          path: fabrics/${{ matrix.fabrics }}/macro/${{ matrix.pdk }}/
+          name: ${{ matrix.fabric }}_${{ matrix.pdk }}_${{ matrix.scl }}
+          path: fabrics/${{ matrix.fabric }}/macro/${{ matrix.pdk }}/
           include-hidden-files: true
       - name: Implement the User Designs
         run: |
-          cd user_designs; PDK=${{ matrix.pdk }} TILE_LIBRARY=${{ env.TILE_LIBRARY }} FABRIC=${{ matrix.fabrics }} nix develop --command make all
+          cd user_designs; PDK=${{ matrix.pdk }} TILE_LIBRARY=${{ env.TILE_LIBRARY }} FABRIC=${{ matrix.fabric }} nix develop --command make all
       - name: Simulate the Fabric (RTL Emulation)
         run: |
-          EMULATION=counter PDK=${{ matrix.pdk }} TILE_LIBRARY=${{ env.TILE_LIBRARY }} FABRIC=${{ matrix.fabrics }} nix develop --command bash -c "cd tb; python3 fabric_tb.py"
+          EMULATION=counter PDK=${{ matrix.pdk }} TILE_LIBRARY=${{ env.TILE_LIBRARY }} FABRIC=${{ matrix.fabric }} nix develop --command bash -c "cd tb; python3 fabric_tb.py"
       - name: Simulate the Fabric (RTL Simulation)
         run: |
-          PDK=${{ matrix.pdk }} TILE_LIBRARY=${{ env.TILE_LIBRARY }} FABRIC=${{ matrix.fabrics }} nix develop --command bash -c "cd tb; python3 fabric_tb.py"
+          PDK=${{ matrix.pdk }} TILE_LIBRARY=${{ env.TILE_LIBRARY }} FABRIC=${{ matrix.fabric }} nix develop --command bash -c "cd tb; python3 fabric_tb.py"
