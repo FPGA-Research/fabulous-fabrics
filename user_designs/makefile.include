@@ -31,6 +31,8 @@ EXTRA_PLIBS_PATH 	 = -extra-plib ../../../../ip/fabulous-tiles/primitives/FABULO
 			   -extra-plib ../../../../ip/fabulous-tiles/primitives/OBUF/yosys/primitives/OBUF.v \
 			   -extra-plib ../../../../ip/fabulous-tiles/primitives/TBUF/yosys/primitives/TBUF.v \
 			   -extra-plib ../../../../ip/fabulous-tiles/primitives/GBUF/yosys/primitives/GBUF.v \
+			   -extra-plib ../../../../ip/fabulous-tiles/primitives/ODDR/yosys/primitives/ODDR.v \
+			   -extra-plib ../../../../ip/fabulous-tiles/primitives/IDDR/yosys/primitives/IDDR.v \
    			   -extra-plib ../../../../ip/fabulous-tiles/primitives/SYS_RESET/yosys/primitives/SYS_RESET.v
 
 ifeq ($(TILE_LIBRARY),classic)

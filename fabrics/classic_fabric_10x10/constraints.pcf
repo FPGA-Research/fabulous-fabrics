@@ -113,3 +113,8 @@ set_io product[8] X0Y5/A
 set_io product[9] X0Y6/A
 set_io product[10] X0Y7/A
 set_io product[11] X0Y8/A
+
+# For the ddr test
+
+set_io ddr_in X0Y5/A
+set_io ddr_out X0Y6/A

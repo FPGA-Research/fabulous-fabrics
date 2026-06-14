@@ -157,16 +157,15 @@ class PCF:
     def write_gtkw(self, path, filter=None):
         "Write a gtkwave save file in order to view the selected signals"
         with open(path, "w") as outfile:
-            outfile.write(f"@28\n")
             for signal_name, signal in self.signals.items():
                 if filter is not None and signal_name in filter:
                     if len(signal) == 1:
+                        outfile.write(f"@28\n")
                         outfile.write(f"#{{{signal_name}_IN}} {self.top}.{signal[0]['IN']._name}\n")
                         outfile.write(f"#{{{signal_name}_OUT}} {self.top}.{signal[0]['OUT']._name}\n")
                         outfile.write(f"#{{{signal_name}_EN}} {self.top}.{signal[0]['EN']._name}\n")
                         outfile.write(f"@200\n")
                         outfile.write(f"-\n")
-                        outfile.write(f"@28\n")
                     else:
                         bits = len(signal)
                         signals_in = [ self.top + "." + use["IN"]._name for index, use in reversed(signal.items()) ]

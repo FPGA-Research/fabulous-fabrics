@@ -15,6 +15,10 @@ if tile_library == "classic":
     from .classic.multiplication import test_multiplication
     from .classic.sys_reset import test_sys_reset
     
+    if fabric == "classic_fabric_10x10":
+    
+        from .classic.ddr import test_ddr
+    
     if fabric != "classic_fabric_heichips25":
     
         from .classic.macc_8x8_20 import test_macc_8x8_20
