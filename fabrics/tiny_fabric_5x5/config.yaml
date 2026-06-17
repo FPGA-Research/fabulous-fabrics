@@ -19,6 +19,10 @@ VERILOG_FILES: []
 # are connected in the top-level integration
 MAGIC_EXT_UNIQUE: notopports
 
+# Set power/ground names
+VDD_NETS: [VPWR]
+GND_NETS: [VGND]
+
 # Unfortunately needed
 GRT_ALLOW_CONGESTION: true
 
