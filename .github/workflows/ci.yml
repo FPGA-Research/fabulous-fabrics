@@ -32,7 +32,7 @@ jobs:
     runs-on: ubuntu-24.04
     strategy:
       matrix:
-        pdk: [sky130A, gf180mcuD, ihp-sg13g2, ihp-sg13cmos5l]
+        pdk: [sky130A, gf180mcuD, ihp-sg13g2, ihp-sg13cmos5l , icsprout55]
         tile_library: [classic, tiny]
         scl: [default]
         include:
@@ -58,10 +58,10 @@ jobs:
       - name: Get the tile library hash
         run: |
           echo "TILE_LIBRARY_SHORT_HASH=$(git rev-parse --short HEAD:ip/fabulous-tiles)" >> $GITHUB_ENV
-      - name: Clone ihp-sg13cmos5l PDK
-        if: matrix.pdk == 'ihp-sg13cmos5l'
+      - name: Clone icsprout55 PDK
+        if: matrix.pdk == 'icsprout55'
         run: |
-          cd ip/fabulous-tiles/; PDK=${{ matrix.pdk }} SCL=${{ matrix.scl }} make clone-ihp-sg13cmos5l
+          cd ip/fabulous-tiles/; PDK=${{ matrix.pdk }} SCL=${{ matrix.scl }} make clone-icsprout55
       - name: Cache the tiles
         uses: actions/cache@v5
         id: cache
@@ -110,10 +110,10 @@ jobs:
         run: |
           echo "TILE_LIBRARY=$(echo "${{ matrix.fabric }}" | cut -d'_' -f1)" >> $GITHUB_ENV
           echo "TILE_LIBRARY_SHORT_HASH=$(git rev-parse --short HEAD:ip/fabulous-tiles)" >> $GITHUB_ENV
-      - name: Clone ihp-sg13cmos5l PDK
-        if: matrix.pdk == 'ihp-sg13cmos5l'
+      - name: Clone icsprout55 PDK
+        if: matrix.pdk == 'icsprout55'
         run: |
-          PDK=${{ matrix.pdk }} SCL=${{ matrix.scl }} make clone-ihp-sg13cmos5l
+          PDK=${{ matrix.pdk }} SCL=${{ matrix.scl }} make clone-icsprout55
       - name: Restore the tiles
         uses: actions/cache/restore@v5
         with:
