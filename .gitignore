@@ -24,3 +24,6 @@ sim_build/
 *.gtkw
 
 IHP-Open-PDK/
+
+# icsprout55 PDK
+icsprout55-openpdk/

@@ -15,6 +15,15 @@ PDK_COMMIT ?= e8a87d708b8977e7c07684b033658a0f80af59a0
 OPTS = --pdk-root ${PDK_ROOT} --manual-pdk
 endif
 
+ifeq ($(PDK),icsprout55)
+PDK_ROOT ?= $(MAKEFILE_DIR)/icsprout55-openpdk
+PDK ?= icsprout55
+PDK_REPO ?= https://github.com/ckdur/icsprout55-openpdk
+PDK_COMMIT ?= 9567646e86e660d3a8c9e1bd535aadf614937de9
+
+OPTS = --pdk-root ${PDK_ROOT} --manual-pdk
+endif
+
 # Get the fabric names
 FABRICS :=  $(patsubst fabrics/%,%,$(wildcard fabrics/*)) 
 
@@ -31,6 +40,12 @@ clone-ihp-sg13cmos5l:
 	git clone $(PDK_REPO_IHP) --recurse-submodules --depth=1 --revision $(PDK_COMMIT_IHP) $(PDK_ROOT)
 	git clone $(PDK_REPO) --recurse-submodules --depth=1 --revision $(PDK_COMMIT) $(PDK_ROOT)/$(PDK)
 .PHONY: clone-ihp-sg13cmos5l
+
+clone-icsprout55:
+	mkdir -p $(PDK_ROOT)
+	git clone $(PDK_REPO) --recurse-submodules --depth=1 --revision $(PDK_COMMIT) $(PDK_ROOT)
+	cd $(PDK_ROOT); bash ./install.sh
+.PHONY: clone-icsprout55
 
 $(FABRICS):
 	librelane --pdk ${PDK} ${OPTS} fabrics/$@/config.yaml --save-views-to fabrics/$@/macro/${PDK}/
