@@ -1,0 +1,27 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fabulous-fabrics"
+version = "0.1.0"
+description = "Fabric definitions and project skeletons for the FABulous FPGA fabric generator"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.12"
+dependencies = ["fabulous-tiles"]
+
+[tool.uv.sources]
+fabulous-tiles = { git = "https://github.com/FPGA-Research/fabulous-tiles.git", rev = "9ad3d6e5686d258e3712073f3ae500d42556062a" }
+
+# fabrics/ stays at the repository root because the LibreLane Makefile and CI address it there.
+[tool.hatch.build.targets.wheel]
+packages = ["fabulous_fabrics"]
+
+[tool.hatch.build.targets.wheel.force-include]
+"fabrics" = "fabulous_fabrics/fabrics"
+
+[tool.hatch.build.targets.sdist]
+only-include = ["fabulous_fabrics", "fabrics", "README.md"]
+ignore-vcs = true
+exclude = ["**/runs", "**/macro", "**/__pycache__"]
