@@ -1,15 +1,21 @@
 [build-system]
-requires = ["hatchling"]
+requires = ["hatchling", "hatch-vcs"]
 build-backend = "hatchling.build"
 
 [project]
 name = "fabulous-fabrics"
-version = "0.1.0"
+dynamic = ["version"]
 description = "Fabric definitions and project skeletons for the FABulous FPGA fabric generator"
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.12"
 dependencies = ["fabulous-tiles"]
+
+# The version comes from the git tag. A build without git history, such as a Nix
+# fetchGit source, falls back to the last release, which release-please bumps.
+[tool.hatch.version]
+source = "vcs"
+fallback-version = "0.0.0"
 
 [tool.uv.sources]
 fabulous-tiles = { git = "https://github.com/FPGA-Research/fabulous-tiles.git", rev = "9ad3d6e5686d258e3712073f3ae500d42556062a" }

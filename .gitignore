@@ -9,6 +9,8 @@ macro/
 runs/
 
 *.json
+!release-please-config.json
+!.release-please-manifest.json
 *.png
 *.svg
 
