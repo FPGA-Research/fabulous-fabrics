@@ -16,7 +16,7 @@ OPTS = --pdk-root ${PDK_ROOT} --manual-pdk
 endif
 
 # Get the fabric names
-FABRICS :=  $(patsubst fabrics/%,%,$(wildcard fabrics/*)) 
+FABRICS :=  $(patsubst fabrics/%/config.yaml,%,$(wildcard fabrics/*/config.yaml))
 
 FABRICS_OPENROAD := $(addsuffix -openroad,$(FABRICS))
 FABRICS_KLAYOUT := $(addsuffix -klayout,$(FABRICS))

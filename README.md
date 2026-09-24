@@ -15,6 +15,18 @@ See below for more information about stitching the fabric.
 
 A Continuous Integration (CI) setup implements the fabrics for the gf180mcu, sky130, and ihp-sg13g2 PDKs.
 
+## Python package
+
+The repository is also the `fabulous-fabrics` Python package, which FABulous uses to create projects. `fabulous_fabrics.fabrics["fabulous"]` describes a fabric, and `fabrics["fabulous"].materialise(dest, Language.VERILOG)` copies it with its tile library into `dest`. A fabric directory registers itself when it holds a `fabric.yaml`:
+
+```yaml
+schema_version: 1
+description: The FABulous demo fabric, formerly the packaged FABulous project template.
+tile_library: fabulous
+```
+
+The project skeleton sits beside it in `common/` and one directory per HDL (`verilog/`, `vhdl/`). The flat fabrics listed above have no `fabric.yaml` and are not registered. Another package adds its own fabrics through the entry-point group `fabulous.fabrics`.
+
 ## Requirements
 
 > [!NOTE]
