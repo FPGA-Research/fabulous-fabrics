@@ -1,15 +1,26 @@
 """FABulous fabrics, registered from the directory layout.
 
 `fabrics["fabulous"]` is a `FabricSource`. See `fabulous_fabrics.sources` for the
-layout rules that register it.
+layout rules that register it and the entry-point group another package uses to add
+its own.
 """
 
 from fabulous_fabrics.sources import (
+    FABRICS_GROUP,
     FABRICS_ROOT,
+    SCHEMA_VERSION,
     FabricMetadata,
     FabricSource,
     fabrics,
     load_fabrics,
 )
 
-__all__ = ["FABRICS_ROOT", "FabricMetadata", "FabricSource", "fabrics", "load_fabrics"]
+__all__ = [
+    "FABRICS_GROUP",
+    "FABRICS_ROOT",
+    "SCHEMA_VERSION",
+    "FabricMetadata",
+    "FabricSource",
+    "fabrics",
+    "load_fabrics",
+]

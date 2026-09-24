@@ -8,7 +8,7 @@ from pydantic import ValidationError
 
 from fabulous_fabrics import FabricSource, fabrics, load_fabrics
 
-METADATA = "description: A test fabric.\ntile_library: lib\n"
+METADATA = "schema_version: 1\ndescription: A test fabric.\ntile_library: lib\n"
 
 
 def _write(path: Path, text: str) -> None:
@@ -18,6 +18,7 @@ def _write(path: Path, text: str) -> None:
 
 @pytest.fixture
 def libraries(tmp_path: Path) -> dict[str, TileLibrary]:
+    _write(tmp_path / "lib/include/Base.list", "A,B\n")
     return {"lib": TileLibrary(name="lib", root=tmp_path / "lib", tiles={})}
 
 
@@ -79,9 +80,21 @@ def test_only_directories_with_metadata_register(
     ("edit", "error", "match"),
     [
         (
-            lambda r: _write(r / "fabric.yaml", "description: x\ntile_library: gone\n"),
+            lambda r: _write(r / "fabric.yaml", METADATA.replace("lib", "gone")),
             ValueError,
             "gone",
+        ),
+        (
+            lambda r: _write(
+                r / "fabric.yaml", METADATA.replace("schema_version: 1\n", "")
+            ),
+            ValueError,
+            "has no schema_version",
+        ),
+        (
+            lambda r: _write(r / "fabric.yaml", METADATA.replace("1", "2")),
+            ValueError,
+            "Upgrade fabulous-fabrics",
         ),
         (
             lambda r: _write(r / "fabric.yaml", METADATA + "extra: 1\n"),
@@ -89,7 +102,7 @@ def test_only_directories_with_metadata_register(
             "extra",
         ),
         (
-            lambda r: _write(r / "fabric.yaml", "description: x\n"),
+            lambda r: _write(r / "fabric.yaml", "schema_version: 1\ndescription: x\n"),
             ValidationError,
             "tile_library",
         ),
@@ -116,8 +129,27 @@ def test_files_rejects_missing_language(
         load_fabrics(fabric_root, libraries)["demo"].files(Language.VHDL)
 
 
+def test_materialise_puts_tiles_under_tile(
+    fabric_root: Path, libraries: dict[str, TileLibrary], tmp_path: Path
+) -> None:
+    dest = tmp_path / "project"
+    load_fabrics(fabric_root, libraries)["demo"].materialise(dest, Language.VERILOG)
+    assert sorted(
+        p.relative_to(dest).as_posix() for p in dest.rglob("*") if p.is_file()
+    ) == [
+        "Fabric/shared.txt",
+        "Tile/include/Base.list",
+        "fabric.csv",
+    ]
+    assert (dest / "Fabric/shared.txt").read_text() == "verilog\n"
+
+
 @pytest.mark.parametrize("language", list(Language))
-def test_packaged_fabulous_fabric(language: Language) -> None:
+def test_packaged_fabulous_fabric(language: Language, tmp_path: Path) -> None:
     fabric = fabrics["fabulous"]
     assert fabric.tile_library.name == "fabulous"
-    assert PurePosixPath("fabric.csv") in fabric.files(language)
+    fabric.materialise(tmp_path, language)
+    assert (tmp_path / "fabric.csv").is_file()
+    assert (
+        tmp_path / f"Tile/LUT4AB/LUT4c_frame_config_dffesr.{language.suffix}"
+    ).is_file()
