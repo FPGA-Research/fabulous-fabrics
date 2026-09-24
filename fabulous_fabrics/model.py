@@ -1,48 +1,21 @@
-"""Fabrics discovered from the directory layout.
-
-A package registers a directory of fabrics under the entry-point group
-`fabulous.fabrics`; this package registers its own `fabrics/` the same way. Inside
-a registered directory, a fabric is any `<name>/` holding a `fabric.yaml`, which
-names the tile library the fabric is built from. The fabric's project skeleton sits
-beside it in `common/` and one directory per HDL (`verilog/`, `vhdl/`). Adding such
-a directory registers it; the registry scans on first access and caches the result
-for the life of the process.
+"""A fabric and the metadata in its `fabric.yaml`.
 
 `fabric.yaml` carries a `schema_version`, checked before anything else, so a fabric
 written for a newer schema fails with a request to upgrade rather than with an
-unknown-field error.
+unknown-field error. The project skeleton sits beside it in `common/` and one
+directory per HDL (`verilog/`, `vhdl/`), and `FabricSource.materialise` is the
+only call FABulous makes.
 """
 
 import shutil
 from collections.abc import Mapping
 from dataclasses import dataclass
-from importlib import resources
 from pathlib import Path, PurePosixPath
 
 import yaml
-from fabulous_tiles import (
-    Language,
-    Registry,
-    TileLibrary,
-    load_entry_points,
-    tile_libraries,
-)
+from fabulous_tiles import Language, TileLibrary
 from pydantic import BaseModel, ConfigDict
 
-
-def _package_root() -> Path:
-    root = resources.files(__package__)
-    if not isinstance(root, Path):
-        raise RuntimeError(
-            f"fabulous_fabrics is installed as {root!r}, not a directory. Install it "
-            "from a wheel or a source checkout, not a zip archive."
-        )
-    return root
-
-
-PACKAGE_ROOT = _package_root()
-FABRICS_ROOT = PACKAGE_ROOT / "fabrics"
-FABRICS_GROUP = "fabulous.fabrics"
 METADATA_FILE = "fabric.yaml"
 SCHEMA_VERSION = 1
 # Every fabric CSV addresses its tiles as `./Tile/<name>/`.
@@ -160,22 +133,3 @@ class FabricSource:
             target.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(src, target)
         self.tile_library.materialise(dest / TILE_DIR, language)
-
-
-def load_fabrics(
-    root: Path, libraries: Mapping[str, TileLibrary]
-) -> dict[str, FabricSource]:
-    """Read every fabric directory under `root` that holds a `fabric.yaml`."""
-    return {
-        d.name: FabricSource.from_dir(d, libraries)
-        for d in sorted(root.iterdir())
-        if (d / METADATA_FILE).is_file()
-    }
-
-
-fabrics: Registry[FabricSource] = Registry(
-    "fabric",
-    lambda: load_entry_points(
-        FABRICS_GROUP, "fabric", lambda root: load_fabrics(root, tile_libraries)
-    ),
-)

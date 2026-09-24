@@ -11,16 +11,16 @@ license = "Apache-2.0"
 requires-python = ">=3.12"
 dependencies = ["fabulous-tiles", "pydantic>=2", "pyyaml>=6"]
 
-# The fabric registry in fabulous_fabrics.sources reads this group, so another
+# The fabric registry in fabulous_fabrics.registry reads this group, so another
 # package can add fabrics by declaring it too.
 [project.entry-points."fabulous.fabrics"]
-fabulous-fabrics = "fabulous_fabrics.sources:FABRICS_ROOT"
+fabulous-fabrics = "fabulous_fabrics.registry:FABRICS_ROOT"
 
 [dependency-groups]
 dev = ["pytest>=8"]
 
 [tool.uv.sources]
-fabulous-tiles = { git = "https://github.com/FPGA-Research/fabulous-tiles.git", rev = "639ff0e686234bd949e892184507162c81a1ddea" }
+fabulous-tiles = { git = "https://github.com/FPGA-Research/fabulous-tiles.git", rev = "b7bdb6a5b6e86e802f5541ea3c49aa5930e35517" }
 
 # The version comes from the git tag. A build without git history, such as a Nix
 # fetchGit source, falls back to the last release, which release-please bumps.
