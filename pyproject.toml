@@ -9,7 +9,13 @@ description = "Fabric definitions and project skeletons for the FABulous FPGA fa
 readme = "README.md"
 license = "Apache-2.0"
 requires-python = ">=3.12"
-dependencies = ["fabulous-tiles"]
+dependencies = ["fabulous-tiles", "pydantic>=2", "pyyaml>=6"]
+
+[dependency-groups]
+dev = ["pytest>=8"]
+
+[tool.uv.sources]
+fabulous-tiles = { git = "https://github.com/FPGA-Research/fabulous-tiles.git", rev = "46e880dd6a00f589e693e5bc500c6480f163c010" }
 
 # The version comes from the git tag. A build without git history, such as a Nix
 # fetchGit source, falls back to the last release, which release-please bumps.
@@ -17,17 +23,16 @@ dependencies = ["fabulous-tiles"]
 source = "vcs"
 fallback-version = "0.0.0"
 
-[tool.uv.sources]
-fabulous-tiles = { git = "https://github.com/FPGA-Research/fabulous-tiles.git", rev = "9ad3d6e5686d258e3712073f3ae500d42556062a" }
-
-# fabrics/ stays at the repository root because the LibreLane Makefile and CI address it there.
+# fabulous_fabrics/fabrics is a symlink to the top-level fabrics/, which stays there
+# because the LibreLane Makefile and CI address it. Hatchling copies the target.
 [tool.hatch.build.targets.wheel]
 packages = ["fabulous_fabrics"]
-
-[tool.hatch.build.targets.wheel.force-include]
-"fabrics" = "fabulous_fabrics/fabrics"
+exclude = ["**/runs", "**/macro", "**/__pycache__"]
 
 [tool.hatch.build.targets.sdist]
-only-include = ["fabulous_fabrics", "fabrics", "README.md"]
+only-include = ["fabulous_fabrics", "README.md"]
 ignore-vcs = true
 exclude = ["**/runs", "**/macro", "**/__pycache__"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

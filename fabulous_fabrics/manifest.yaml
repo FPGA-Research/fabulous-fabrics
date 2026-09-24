@@ -1,6 +1,0 @@
-fabrics:
-  fabulous:
-    root: fabrics/fabulous
-    tile_library:
-      package: fabulous_tiles
-      name: fabulous
