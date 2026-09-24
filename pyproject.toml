@@ -15,7 +15,7 @@ dependencies = ["fabulous-tiles", "pydantic>=2", "pyyaml>=6"]
 dev = ["pytest>=8"]
 
 [tool.uv.sources]
-fabulous-tiles = { git = "https://github.com/FPGA-Research/fabulous-tiles.git", rev = "46e880dd6a00f589e693e5bc500c6480f163c010" }
+fabulous-tiles = { git = "https://github.com/FPGA-Research/fabulous-tiles.git", rev = "3fa549b74bd2fb83ac9186460c455877a7f8aa68" }
 
 # The version comes from the git tag. A build without git history, such as a Nix
 # fetchGit source, falls back to the last release, which release-please bumps.
@@ -24,9 +24,11 @@ source = "vcs"
 fallback-version = "0.0.0"
 
 # fabulous_fabrics/fabrics is a symlink to the top-level fabrics/, which stays there
-# because the LibreLane Makefile and CI address it. Hatchling copies the target.
+# because the LibreLane Makefile and CI address it. Hatchling copies the target, and
+# the VCS ignore filter would drop a gitignored asset such as a *.json file.
 [tool.hatch.build.targets.wheel]
 packages = ["fabulous_fabrics"]
+ignore-vcs = true
 exclude = ["**/runs", "**/macro", "**/__pycache__"]
 
 [tool.hatch.build.targets.sdist]

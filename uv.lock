@@ -36,7 +36,7 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "fabulous-tiles", git = "https://github.com/FPGA-Research/fabulous-tiles.git?rev=46e880dd6a00f589e693e5bc500c6480f163c010" },
+    { name = "fabulous-tiles", git = "https://github.com/FPGA-Research/fabulous-tiles.git?rev=3fa549b74bd2fb83ac9186460c455877a7f8aa68" },
     { name = "pydantic", specifier = ">=2" },
     { name = "pyyaml", specifier = ">=6" },
 ]
@@ -46,8 +46,8 @@ dev = [{ name = "pytest", specifier = ">=8" }]
 
 [[package]]
 name = "fabulous-tiles"
-version = "0.0.1.dev128+g46e880dd6"
-source = { git = "https://github.com/FPGA-Research/fabulous-tiles.git?rev=46e880dd6a00f589e693e5bc500c6480f163c010#46e880dd6a00f589e693e5bc500c6480f163c010" }
+version = "0.0.1.dev129+g3fa549b74"
+source = { git = "https://github.com/FPGA-Research/fabulous-tiles.git?rev=3fa549b74bd2fb83ac9186460c455877a7f8aa68#3fa549b74bd2fb83ac9186460c455877a7f8aa68" }
 
 [[package]]
 name = "iniconfig"
