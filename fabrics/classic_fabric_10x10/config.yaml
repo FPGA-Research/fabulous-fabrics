@@ -38,6 +38,9 @@ FABULOUS_HALO_SPACING: [ 0, 0, 0, 0 ]
 IO_PIN_H_LENGTH: null
 IO_PIN_V_LENGTH: null
 
+# Export only areas marked as pin
+MAGIC_WRITE_LEF_PINONLY: True
+
 # Save on file space by sharing same cells
 PRIMARY_GDSII_STREAMOUT_TOOL: klayout
 #KLAYOUT_CONFLICT_RESOLUTION: SkipNewCell
@@ -63,7 +66,7 @@ pdk::ihp-sg13g2:
     RT_MAX_LAYER: TopMetal1
     
     # Timing model generation
-    FABULOUS_TIMING_MODEL: PHYSICAL
+    #FABULOUS_TIMING_MODEL: PHYSICAL
 
 pdk::ihp-sg13cmos5l:
     # Routing
